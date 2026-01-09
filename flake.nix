@@ -19,6 +19,7 @@
             requests
             python-dotenv
             ruff
+            git-filter-repo
           ]))
         ];
       };
