@@ -37,6 +37,14 @@
 DFRobot_DHT11 DHT;
 #define DHT11_PIN 7
 
+// LED for alarm indication 
+// FIXME: needs adjustion
+#define ALARM_LED_PIN 8
+
+// Downlink command bytes
+#define CMD_LED_OFF 0x00
+#define CMD_LED_ON  0x01
+
 #include "config.h" 
 
 // This EUI must be in little-endian format, so least-significant-byte
@@ -70,6 +78,36 @@ const lmic_pinmap lmic_pins = {
     .rst = LMIC_UNUSED_PIN, //
     .dio = {2, 3, LMIC_UNUSED_PIN},
 };
+
+void handleDownlink() {
+    if (LMIC.dataLen == 0) return;
+
+    uint8_t* data = &LMIC.frame[LMIC.dataBeg];
+
+    Serial.print(F("Downlink data: "));
+    for (int i = 0; i < LMIC.dataLen; i++) {
+        Serial.print(data[i], HEX);
+        Serial.print(F(" "));
+    }
+    Serial.println();
+
+    uint8_t cmd = data[0];
+
+    switch (cmd) {
+        case CMD_LED_ON:
+            Serial.println(F("ALARM: LED ON"));
+            digitalWrite(ALARM_LED_PIN, HIGH);
+            break;
+        case CMD_LED_OFF:
+            Serial.println(F("ALARM OFF: LED OFF"));
+            digitalWrite(ALARM_LED_PIN, LOW);
+            break;
+        default:
+            Serial.print(F("Unknown command: "));
+            Serial.println(cmd, HEX);
+            break;
+    }
+}
 
 void onEvent (ev_t ev) {
     Serial.print(os_getTime());
@@ -112,9 +150,10 @@ void onEvent (ev_t ev) {
             if (LMIC.txrxFlags & TXRX_ACK)
               Serial.println(F("Received ack"));
             if (LMIC.dataLen) {
-              Serial.println(F("Received "));
-              Serial.println(LMIC.dataLen);
+              Serial.print(F("Received "));
+              Serial.print(LMIC.dataLen);
               Serial.println(F(" bytes of payload"));
+              handleDownlink();
             }
             // Schedule next transmission
             os_setTimedCallback(&sendjob, os_getTime()+sec2osticks(TX_INTERVAL), do_send);
@@ -163,6 +202,10 @@ void do_send(osjob_t* j){
 void setup() {
     Serial.begin(9600);
     Serial.println(F("Starting"));
+
+    // Initialize alarm LED pin
+    pinMode(ALARM_LED_PIN, OUTPUT);
+    digitalWrite(ALARM_LED_PIN, LOW);
 
     #ifdef VCC_ENABLE
     // For Pinoccio Scout boards

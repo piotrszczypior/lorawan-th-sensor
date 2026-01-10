@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 from typing import Any
@@ -8,6 +9,15 @@ import requests
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# LED command bytes (must match firmware)
+CMD_LED_OFF = 0x00
+CMD_LED_ON = 0x01
+
+# Alarm configuration
+TEMP_THRESHOLD = 40.0
+DEBUG_ALARM = True  # Set to True to simulate high temperature for testing
+DEBUG_ALARM_TEMP = 45.0  # Simulated temperature when DEBUG_ALARM is True
 
 # MQTT Configuration (The Things Network)
 HOST = os.getenv("MQTT_HOST", "eu1.cloud.thethings.network")
@@ -27,14 +37,16 @@ DEBUG = True
 
 
 def parse_data(value) -> tuple[float, float]:
+    if DEBUG:
+        return 20.0, 50.0
+
     temp, hum = value.split(",")
     temp = temp.split(":")[1]
     hum = hum.split(":")[1]
-
     return float(temp), float(hum)
 
 
-def write_to_influx(device_id: str, value: str) -> None:
+def write_to_influx(device_id: str, temp: float, hum: float) -> None:
     """
     Send data to InfluxDB v2 via HTTP API.
     Line Protocol format: measurement,tag=value field=value
@@ -45,11 +57,6 @@ def write_to_influx(device_id: str, value: str) -> None:
         "Authorization": f"Token {INFLUX_TOKEN}",
         "Content-Type": "text/plain; charset=utf-8",
     }
-
-    if DEBUG:
-        temp, hum = 20.0, 50.0
-    else:
-        temp, hum = parse_data(value)
 
     line_protocol = f"measurements_ttn,device={device_id} T={temp},H={hum}"
 
@@ -67,13 +74,66 @@ def write_to_influx(device_id: str, value: str) -> None:
         print(f"! Exception while connecting to InfluxDB: {e}")
 
 
+def send_downlink(client: mqtt.Client, command: int) -> None:
+    """
+    Send a downlink command to the device via TTN MQTT.
+    """
+    topic = f"v3/{APP_ID}@ttn/devices/{DEV_EUI}/down/push"
+
+    payload_bytes = bytes([command])
+    payload_b64 = base64.b64encode(payload_bytes).decode("ascii")
+
+    downlink_msg = {
+        "downlinks": [
+            {
+                "f_port": 1,
+                "frm_payload": payload_b64,
+                "priority": "NORMAL",
+            }
+        ]
+    }
+
+    client.publish(topic, json.dumps(downlink_msg))
+    cmd_name = "LED_ON" if command == CMD_LED_ON else "LED_OFF"
+    print(f"[DOWNLINK] Sent {cmd_name} command to {DEV_EUI}")
+
+
+def check_temperature_alarm(client: mqtt.Client, temp: float) -> None:
+    """
+    Check if temperature exceeds threshold and send alarm command.
+    """
+    command = CMD_LED_ON if temp > TEMP_THRESHOLD else CMD_LED_OFF
+
+    if temp > TEMP_THRESHOLD:
+        print(f"[ALARM] Temperature {temp}°C exceeds threshold {TEMP_THRESHOLD}°C!")
+        command = CMD_LED_ON
+    else:
+        print(f"[OK] Temperature {temp}°C is below threshold {TEMP_THRESHOLD}°C")
+        command = CMD_LED_OFF
+
+    print(f"Sending downlink to device. Command: {command}")
+    if DEBUG:
+        return
+
+    send_downlink(client, CMD_LED_ON)
+
+
 def on_message(client: mqtt.Client, userdata: Any, message: mqtt.MQTTMessage) -> None:
     data = json.loads(message.payload.decode())
     print(data)
     payload_from_device = data["uplink_message"]["decoded_payload"]["text"]
     print(payload_from_device)
 
-    write_to_influx(DEV_EUI, payload_from_device)
+    temp, hum = parse_data(payload_from_device)
+
+    write_to_influx(DEV_EUI, temp, hum)
+
+    # Parse temperature and check alarm
+    if DEBUG_ALARM:
+        temp = DEBUG_ALARM_TEMP
+        print(f"[DEBUG_ALARM] Using simulated temperature: {temp}°C")
+
+    check_temperature_alarm(client, temp)
 
 
 def main() -> None:
