@@ -1,10 +1,14 @@
 # LoRaWAN Temperature & Humidity Sensor
 
-Collects temperature and humidity data from LoRaWAN sensors via The Things Network (TTN) and stores them in InfluxDB.
+Collects temperature and humidity data from LoRaWAN sensors via The Things Network (TTN), stores them in InfluxDB, and visualizes in Grafana.
 
 ## Configuration
 
-Copy the template below to `.env` file and fill in your credentials:
+Copy `.env.example` to `.env` and fill in your credentials:
+
+```bash
+cp .env.example .env
+```
 
 ```env
 # InfluxDB Configuration
@@ -15,6 +19,10 @@ INFLUXDB_INIT_PASSWORD=your-password
 INFLUXDB_INIT_ORG=your-org
 INFLUXDB_INIT_BUCKET=your-bucket
 INFLUXDB_INIT_ADMIN_TOKEN=your-influxdb-token
+
+# Grafana Configuration
+GRAFANA_ADMIN_USER=admin
+GRAFANA_ADMIN_PASSWORD=your-password
 
 # MQTT Configuration (The Things Network)
 MQTT_HOST=eu1.cloud.thethings.network

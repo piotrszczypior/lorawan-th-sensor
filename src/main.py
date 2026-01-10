@@ -26,12 +26,12 @@ INFLUX_BUCKET = os.getenv("INFLUXDB_INIT_BUCKET", "pwr")
 DEBUG = True
 
 
-def parse_data(value) -> tuple[str, str]:
+def parse_data(value) -> tuple[float, float]:
     temp, hum = value.split(",")
-    temp = temp.replace(":", "=")
-    hum = hum.replace(":", "=")
+    temp = temp.split(":")[1]
+    hum = hum.split(":")[1]
 
-    return temp, hum
+    return float(temp), float(hum)
 
 
 def write_to_influx(device_id: str, value: str) -> None:
@@ -47,11 +47,11 @@ def write_to_influx(device_id: str, value: str) -> None:
     }
 
     if DEBUG:
-        temp, hum = "T=20", "H=20"
+        temp, hum = 20.0, 50.0
     else:
         temp, hum = parse_data(value)
 
-    line_protocol = f"measurements_ttn,device={device_id} {temp},{hum}"
+    line_protocol = f"measurements_ttn,device={device_id} T={temp},H={hum}"
 
     print(f"[DEBUG] Line Protocol: {line_protocol}")
 
