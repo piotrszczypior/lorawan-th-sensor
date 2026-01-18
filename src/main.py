@@ -1,12 +1,15 @@
+from webhook import run_flask
+
 import base64
 import json
 import os
 from typing import Any
-
 import paho.mqtt.client as mqtt
 from paho.mqtt.enums import CallbackAPIVersion
 import requests
 from dotenv import load_dotenv
+import threading
+
 
 load_dotenv()
 
@@ -158,4 +161,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    flask_thread = threading.Thread(target=run_flask)
+    flask_thread.start()
+
     main()
+
+   
