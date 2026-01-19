@@ -1,0 +1,85 @@
+apiVersion: 1
+groups:
+    - orgId: 1
+      name: alert-evaluation-group
+      folder: temp-alert
+      interval: 1m
+      rules:
+        - uid: cfao7vko3zjeof
+          title: Temperature alert
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: P951FEA4DE68E13C5
+              model:
+                intervalMs: 1000
+                maxDataPoints: 43200
+                query: |
+                    from(bucket: "pwr")
+                      |> range(start: -1m)
+                      |> filter(fn: (r) => r["_measurement"] == "measurements_ttn")
+                      |> filter(fn: (r) => r["_field"] == "T")
+                      |> filter(fn: (r) => r["device"] == "ht11-device-1")
+                      |> last()
+                refId: A
+            - refId: B
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: ""
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 30
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: KeepLast
+          execErrState: Error
+          keepFiringFor: 1s
+          isPaused: false
+          notification_settings:
+            receiver: Alert Webhook
