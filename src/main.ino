@@ -81,8 +81,9 @@ const lmic_pinmap lmic_pins = {
 
 void handleDownlink() {
     if (LMIC.dataLen == 0) return;
-
-    uint8_t* data = &LMIC.frame[LMIC.dataBeg];
+// wskaxniki i pamiec i nadpisywamie 
+// data Reg
+    uint8_t* data = &LMIC.frame[LMIC.dataBeg]; //fixme nie wskaxnik - tylko liczba
 
     Serial.print(F("Downlink data: "));
     for (int i = 0; i < LMIC.dataLen; i++) {

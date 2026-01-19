@@ -18,9 +18,9 @@ CMD_LED_OFF = 0x00
 CMD_LED_ON = 0x01
 
 # Alarm configuration
-TEMP_THRESHOLD = 40.0
-DEBUG_ALARM = True  # Set to True to simulate high temperature for testing
-DEBUG_ALARM_TEMP = 45.0  # Simulated temperature when DEBUG_ALARM is True
+TEMP_THRESHOLD = 20.0
+DEBUG_ALARM = False  # Set to True to simulate high temperature for testing
+DEBUG_ALARM_TEMP = 20.0  # Simulated temperature when DEBUG_ALARM is True
 
 # MQTT Configuration (The Things Network)
 HOST = os.getenv("MQTT_HOST", "eu1.cloud.thethings.network")
@@ -36,7 +36,7 @@ INFLUX_TOKEN = os.getenv("INFLUXDB_INIT_ADMIN_TOKEN", "")
 INFLUX_ORG = os.getenv("INFLUXDB_INIT_ORG", "pwr")
 INFLUX_BUCKET = os.getenv("INFLUXDB_INIT_BUCKET", "pwr")
 
-DEBUG = True
+DEBUG = False
 
 
 def parse_data(value) -> tuple[float, float]:
@@ -105,7 +105,7 @@ def check_temperature_alarm(client: mqtt.Client, temp: float) -> None:
     """
     Check if temperature exceeds threshold and send alarm command.
     """
-    command = CMD_LED_ON if temp > TEMP_THRESHOLD else CMD_LED_OFF
+    # command = CMD_LED_ON if temp > TEMP_THRESHOLD else CMD_LED_OFF
 
     if temp > TEMP_THRESHOLD:
         print(f"[ALARM] Temperature {temp}°C exceeds threshold {TEMP_THRESHOLD}°C!")
@@ -115,10 +115,10 @@ def check_temperature_alarm(client: mqtt.Client, temp: float) -> None:
         command = CMD_LED_OFF
 
     print(f"Sending downlink to device. Command: {command}")
-    if DEBUG:
-        return
+    # if DEBUG:
+        # return
 
-    send_downlink(client, CMD_LED_ON)
+    send_downlink(client, command)
 
 
 def on_message(client: mqtt.Client, userdata: Any, message: mqtt.MQTTMessage) -> None:
@@ -140,7 +140,7 @@ def on_message(client: mqtt.Client, userdata: Any, message: mqtt.MQTTMessage) ->
 
 
 def main() -> None:
-    mqtt_client = mqtt.Client(callback_api_version=CallbackAPIVersion.VERSION1)
+    mqtt_client = mqtt.Client(callback_api_version=CallbackAPIVersion.VERSION2)
     mqtt_client.username_pw_set(USERNAME, KEY)
     mqtt_client.tls_set()
     mqtt_client.on_message = on_message
