@@ -43,7 +43,7 @@ def send_downlink(command: int) -> bool:
             {
                 "f_port": 1,
                 "frm_payload": payload_b64,
-                "priority": "NORMAL",
+                "priority": "NORMAL"
             }
         ]
     }

@@ -14,7 +14,7 @@ INFLUX_BUCKET = os.getenv("INFLUXDB_INIT_BUCKET", "pwr")
 
 DEV_EUI = os.getenv("MQTT_DEV_EUI", "")
 
-DEBUG = True
+DEBUG = False
 
 
 def parse_data(value) -> tuple[float, float]:
@@ -57,7 +57,7 @@ def write_to_influx(device_id: str, temp: float, hum: float) -> None:
 
 def on_message(client: mqtt.Client, userdata: Any, message: mqtt.MQTTMessage) -> None:
     data = json.loads(message.payload.decode())
-    print(data)
+    # print(data)
     payload_from_device = data["uplink_message"]["decoded_payload"]["text"]
     print(payload_from_device)
 

@@ -3,7 +3,7 @@ groups:
     - orgId: 1
       name: alert-evaluation-group
       folder: temp-alert
-      interval: 1m
+      interval: 10s
       rules:
         - uid: cfao7vko3zjeof
           title: Temperature alert
@@ -19,7 +19,7 @@ groups:
                 maxDataPoints: 43200
                 query: |
                     from(bucket: "pwr")
-                      |> range(start: -1m)
+                      |> range(start: -5m)
                       |> filter(fn: (r) => r["_measurement"] == "measurements_ttn")
                       |> filter(fn: (r) => r["_field"] == "T")
                       |> filter(fn: (r) => r["device"] == "ht11-device-1")
@@ -58,7 +58,7 @@ groups:
                 conditions:
                     - evaluator:
                         params:
-                            - 30
+                            - 28
                         type: gt
                       operator:
                         type: and
@@ -78,6 +78,7 @@ groups:
                 refId: C
                 type: threshold
           noDataState: KeepLast
+          for: 0s
           execErrState: Error
           keepFiringFor: 1s
           isPaused: false
