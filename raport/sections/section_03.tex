@@ -1,0 +1,25 @@
+\section{Wstęp}
+\noindent
+Celem systemu jest zdalny pomiar temperatury i wilgotności oraz ich wizualizacja i nadzór progowy. \\
+\noindent
+Komunikacja z urządzeniem realizowana jest w sieci LoRaWAN z wykorzystaniem TTN, a dane trafiają do bazy InfluxDB i są prezentowane w Grafanie. \\
+\noindent
+Zaprojektowano ścieżkę zwrotną (downlink) do sygnalizacji alarmu na urządzeniu końcowym. \\
+\noindent
+Całość uruchamiana jest lokalnie w kontenerach, z konfiguracją przekazywaną przez zmienne środowiskowe.
+
+\subsection{Zakres i cele}
+\noindent
+Zakres obejmuje firmware węzła LoRaWAN, odbiór uplinku po MQTT, zapis do bazy czasowej oraz wizualizację i alarmowanie. \\
+\noindent
+System zapewnia jednolitą ścieżkę danych dla wielu pomiarów i umożliwia reakcję na przekroczenia progów.
+
+\subsection{Zastosowane protokoły}
+\noindent
+LoRaWAN. \\
+\noindent
+MQTT (TTN). \\
+\noindent
+HTTP/HTTPS (API InfluxDB oraz webhook Grafany). \\
+\noindent
+TLS (szyfrowanie połączeń MQTT).

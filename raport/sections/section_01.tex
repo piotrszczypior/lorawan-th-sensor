@@ -1,0 +1,90 @@
+\section{Implementacja i konfiguracja}
+\noindent
+Moduł \texttt{main.py} inicjalizuje klienta MQTT, uruchamia pętlę subskrypcji uplinku oraz równolegle serwer Flask dla webhooków. \\
+\noindent
+Moduł \texttt{uplink.py} dekoduje payload, wylicza temperaturę i wilgotność oraz zapisuje pomiar w linii \texttt{measurements\_ttn,device=... T=...,H=...}. \\
+\noindent
+Moduł \texttt{webhook.py} reaguje na alerty Grafany i steruje downlinkiem, a \texttt{downlink.py} publikuje komendy LED do TTN. \\
+\noindent
+Środowisko uruchomieniowe oparto o \texttt{docker-compose} z usługami InfluxDB i Grafana oraz konfiguracją przez zmienne środowiskowe.
+
+\subsection{Inicjalizacja klienta MQTT}
+\noindent
+Konfiguracja połączenia z TTN wykonywana jest na starcie aplikacji.
+\begin{minted}{python}
+mqtt_client = mqtt.Client(callback_api_version=CallbackAPIVersion.VERSION2)
+mqtt_client.username_pw_set(USERNAME, KEY)
+mqtt_client.tls_set()
+mqtt_client.on_message = on_message
+mqtt_client.connect(HOST, PORT, keepalive=60)
+\end{minted}
+\noindent
+Wątek serwera Flask uruchamiany jest niezależnie od pętli MQTT.
+
+\begin{minted}{python}
+flask_thread = threading.Thread(target=run_flask)
+flask_thread.start()
+initialize_mqtt_client()
+\end{minted}
+
+\subsection{Subskrypcja uplinku}
+\noindent
+Subskrypcja ogranicza się do urządzenia o wskazanym \texttt{DEV\_EUI}.
+\begin{minted}{python}
+sub = f"v3/{APP_ID}@ttn/devices/{DEV_EUI}/up"
+mqtt_client.subscribe(sub)
+\end{minted}
+
+\subsection{Publikacja downlink}
+\noindent
+Komenda LED kodowana jest do base64 i wysyłana na temat TTN.
+\begin{minted}{python}
+payload_bytes = bytes([command])
+payload_b64 = base64.b64encode(payload_bytes).decode("ascii")
+downlink_msg = {
+		"downlinks": [
+				{
+						"f_port": 1,
+						"frm_payload": payload_b64,
+						"priority": "NORMAL"
+				}
+		]
+}
+client.publish(topic, json.dumps(downlink_msg))
+\end{minted}
+
+\subsection{Usługi w kontenerach}
+\noindent
+InfluxDB i Grafana uruchamiane są jako osobne usługi, a konfiguracja jest przekazywana z pliku środowiskowego.
+\begin{minted}{yaml}
+services:
+	influxdb:
+		image: influxdb:2.7ch
+	grafana:
+		image: grafana/grafana:latest
+\end{minted}
+\noindent
+Istotne zmienne środowiskowe są wymagane do poprawnej konfiguracji usług i dostępu do TTN.
+\begin{minted}{text}
+INFLUX_HOST              		- adres URL InfluxDB
+INFLUXDB_INIT_ORG        		- organizacja w InfluxDB
+INFLUXDB_INIT_BUCKET     		- bucket dla pomiarów
+INFLUXDB_INIT_ADMIN_TOKEN		- token do autoryzacji zapisu
+MQTT_HOST                		- adres brokera TTN
+MQTT_PORT                		- port połączenia MQTT
+MQTT_USERNAME            		- nazwa użytkownika TTN
+MQTT_KEY                 		- klucz API TTN
+MQTT_APP_ID              		- identyfikator aplikacji TTN
+MQTT_DEV_EUI             		- identyfikator urządzenia
+\end{minted}
+
+\subsection{Struktura modułów}
+\noindent
+Podział na moduły upraszcza utrzymanie i wydziela odpowiedzialności.
+\begin{minted}{text}
+main.py      - start aplikacji, MQTT, Flask
+uplink.py    - odbiór i zapis do InfluxDB
+downlink.py  - budowanie i wysyłka downlink
+webhook.py   - obsługa alertów Grafany
+main.ino     - firmware węzła LoRaWAN
+\end{minted}

@@ -1,0 +1,157 @@
+% Author - Jon Arnt Kårstad, NTNU IV-IMT
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{packages}[2021/04/20 Packages]
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage[utf8]{inputenc}
+
+
+% ------ Contents -------
+% Appendices
+% Bibliography & References
+% Code input
+% Colors
+% Flow charts
+% Front matter
+% General
+% Image
+% Language
+% Main matter
+% Mathematics
+% Page setup
+% -----------------------
+
+% --- Appendices ---
+\usepackage{appendix}
+\newcommand{\addappendix}{   % Self-created command to insert appendix with predefined settings
+    \newpage
+    \appendix
+    \section*{Appendix}   % Name of appendix
+    \addcontentsline{toc}{section}{Appendix}  % Add appendix name to table of contents
+    \renewcommand{\thesubsection}{\Alph{subsection}}    % Change numbering of section to upper-case letters.
+}
+
+% --- Bibliography & References---  
+\usepackage[backend = biber,    % Recommended backend for sorting bibliography
+            style = authoryear-comp,    % Close to the 'Harvard' referencing style
+            urldate = long,     % Long: 24th Mar. 1997 | Short: 24/03/1997
+            maxcitenames = 2,   % Number of authors in cite before replaced with 'Author#1 et al.'
+            ]{biblatex}
+\addbibresource{references.bib}     % Adding our file containing the references
+% \addbibresource{reference_2.bib} is possible if we want to add several reference files
+
+\usepackage{caption}        % Enables controlling the look and feel of captions, see package documentation
+\usepackage{subcaption}     % Recommended when making sub-figures
+\usepackage[nottoc]{tocbibind}  % Includes Bibliography, Index, list of Listing etc. to table of contents
+\newcommand{\source}[1]{\vspace{-4pt} \caption*{\hfill \footnotesize{Source: {#1}} } }   % Easily insert sources in images
+
+% --- Code ---
+\usepackage{minted} % Includes several programming languages and styles, visit --https://www.ntnu.no/wiki/display/imtsoftware/Code+in+LaTeX-- for more information and examples
+
+% --- Colors ---
+\usepackage[dvipsnames]{xcolor} % Using colors in LaTeX. This package is placed here as it needs to be imported previous to the flow chart packages to ensure no errors.
+
+% --- Flow Charts ---
+% Keep in mind that you may customize these flow chart settings to fit your own preferences.
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\tikzstyle{decision} = [diamond, draw, fill=blue!20, 
+    text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw, fill=blue!20, 
+    text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
+    minimum height=2em]
+
+% --- Front matter ---
+% Front matter is located before the table of contents, e.g. preface (Norsk: forord) and often has separate settings
+\newcommand{\frontmatter}{
+    \pagenumbering{roman}   % Setting page numbering to lower-case roman
+}
+
+% --- General ---
+\usepackage{import}     % Enable importing of sections
+\usepackage{csquotes}   % Provides international handling of quote marks. Especially useful for bibliography management using BibLaTeX
+\usepackage{hyperref}   % Hyper-references, possible to change color
+\hypersetup{    % Color of hyper-references
+    colorlinks,
+    citecolor = black,
+    filecolor = black,
+    linkcolor = black,
+    urlcolor = black
+}
+\usepackage{comment}    % Comment blocks of text using \begin{comment} ... \end{comment}
+\usepackage{pdfpages}   % Enables import of pdf-pages using e.g. \includepdf[pages=-]{./my_pdf.pdf}
+
+% --- Image ---
+\usepackage{graphicx}   % Handle images
+\usepackage{wrapfig}    % Wrap text around images
+\usepackage{float}      % Force image location using "H"
+\usepackage{url}        % Insert urls
+\urlstyle{sf}           % Set url-style as "sans-serif". Other options are e.g. "same" or "rm"
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}   % Ruler
+
+% --- Language ---
+\usepackage{siunitx}    % Enable SI units
+\addto\extrasbritish{   % Change naming of different functions, e.g. figure references.
+    \renewcommand*\contentsname{Spis treści}  % Rename table of contents
+    \renewcommand{\listfigurename}{List of Figures} % Rename list of figures
+    \renewcommand{\listtablename}{List of Tables}   % Rename list of tables
+    \def\equationautorefname{Equation}              % Autoref-name for equations
+    \def\figureautorefname{Figure}                  % Autoref-name for figures
+    \def\tableautorefname{Tablica}                    % Autoref-name for tables
+    \def\sectionautorefname{Sekcja}                % Autoref-name for sections
+    \def\subsectionautorefname{\sectionautorefname} % Autoref-name for subsections
+    \def\subsubsectionautorefname{\sectionautorefname}
+}
+
+\newcommand{\mainmatter}{
+    \newpage
+    \pagenumbering{arabic}
+}
+
+\usepackage{bm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{textcomp}
+\usepackage{gensymb}
+
+\usepackage[a4paper, total={150mm, 245mm,footskip = 14mm}]{geometry}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{0.8em}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.1ex}
+\renewcommand{\footrulewidth}{0.1ex}
+\fancyfoot[C]{\thepage}
+
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{colortbl}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz -timing}
+\usepackage{tikz}
+\usetikzlibrary{karnaugh}
+
+\definecolor{LogisimKMapColor0}{RGB}{128,0,0}
+\definecolor{LogisimKMapColor1}{RGB}{230,25,75}
+\definecolor{LogisimKMapColor2}{RGB}{250,190,190}
+\definecolor{LogisimKMapColor3}{RGB}{170,110,40}
+\definecolor{LogisimKMapColor4}{RGB}{245,130,48}
+\definecolor{LogisimKMapColor5}{RGB}{255,215,180}
+\definecolor{LogisimKMapColor6}{RGB}{128,128,0}
+\definecolor{LogisimKMapColor7}{RGB}{255,255,25}
+\definecolor{LogisimKMapColor8}{RGB}{210,245,60}
+\definecolor{LogisimKMapColor9}{RGB}{0,0,128}
+\definecolor{LogisimKMapColor10}{RGB}{145,30,180}
+\definecolor{LogisimKMapColor11}{RGB}{60,180,175}
+\definecolor{LogisimKMapColor12}{RGB}{0,130,203}
+\definecolor{LogisimKMapColor13}{RGB}{230,190,255}
+\definecolor{LogisimKMapColor14}{RGB}{170,255,195}
+\definecolor{LogisimKMapColor15}{RGB}{240,50,230}
+

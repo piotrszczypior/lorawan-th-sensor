@@ -1,0 +1,89 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[polish]{babel}
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+% \setlength{\parskip}{0.8em}
+\usepackage[a4paper, width={180mm}, height=27cm]{geometry}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{array}
+\usepackage[a4paper]{geometry}
+\usepackage{graphicx}
+\usepackage{minted,xcolor}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{multirow}
+\usepackage{diagbox}
+\usepackage[document]{ragged2e}
+\usepackage{subcaption}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+% \usepackage{packages}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{ragged2e}
+\usepackage{tabularx, ragged2e}
+\usepackage{mathtools}
+\usepackage{blindtext}
+\usepackage{lipsum}
+\usepackage{multicol}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage{pgfplots}
+\usepackage{booktabs}
+
+\setcounter{secnumdepth}{4}
+\setminted{tabsize=2}
+
+\definecolor{bg}{HTML}{282828} 
+
+\newcommand{\codeemph}[1]{\colorbox{lightgray!30}{\emph{#1}}}
+\newcommand{\codeinline}[1]{\mintinline[breaklines]{java}{#1}}
+\newcommand{\pkt}[1]{\small{(#1 pkt)}}
+
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    showstringspaces=false,
+    frame=single,
+    numbers=none,
+    captionpos=t,
+    keywordstyle=\normalfont,
+    commentstyle=\normalfont,
+    stringstyle=\normalfont,
+    backgroundcolor=\color{white}
+}
+
+\geometry{margin=1in}
+
+\title{Report Title}
+\author{Your Name}
+\date{\today}
+
+\begin{document}
+\begin{justify}
+
+
+% \begin{abstract}
+% A short abstract of the report.
+% \end{abstract}
+
+% \tableofcontents
+\input{sections/title.tex}
+
+
+\clearpage
+
+\input{sections/section_03.tex}
+\input{sections/section_04.tex}
+\input{sections/section_02.tex}
+\input{sections/section_01.tex}
+\input{sections/section_05.tex}
+\input{sections/section_00.tex}
+
+\end{justify}
+\end{document}

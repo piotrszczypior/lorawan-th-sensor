@@ -1,0 +1,29 @@
+\section{Wnioski i materiały graficzne}
+\noindent
+Zaimplementowano pełny łańcuch od pomiaru do wizualizacji i reakcji zwrotnej poprzez downlink. \\
+\noindent
+Konfiguracja systemu opiera się na TTN, MQTT, InfluxDB i Grafanie, co umożliwia szybkie uruchomienie w środowisku kontenerowym. \\
+\noindent
+Struktura aplikacji rozdziela logikę odbioru uplinku, zapisu do bazy oraz obsługę webhooków, co upraszcza testowanie i utrzymanie. \\
+\noindent
+Miejsca na ilustracje do uzupełnienia: \\
+\noindent
+TTN -- zrzut panelu urządzenia i ruchu uplink/downlink. \\
+\noindent
+Grafana -- panel wykresów i konfiguracja alertu. \\
+\noindent
+InfluxDB -- widok bucketu lub zapytania z danymi.
+
+\subsection{Dodatkowe miejsca na grafiki}
+\noindent
+Urządzenie końcowe -- zdjęcie sprzętu i podłączenia czujnika. \\
+\noindent
+Przepływ danych -- schemat kroków od pomiaru do wizualizacji. \\
+\noindent
+Logi aplikacji -- przykładowe wpisy z odbioru i zapisu.
+
+\subsection{Uwagi końcowe}
+\noindent
+Rozwiązanie jest gotowe do rozbudowy o kolejne urządzenia i dodatkowe metryki, bez zmiany architektury logicznej. \\
+\noindent
+Wprowadzanie progów i reguł alarmowania odbywa się po stronie Grafany, bez ingerencji w firmware.

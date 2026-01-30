@@ -1,0 +1,20 @@
+\section{Grafana -- wizualizacja i alarmy}
+\noindent
+Grafana odczytuje pomiary z InfluxDB i prezentuje je na panelach czasowych. \\
+\noindent
+Alerty progowe są definiowane po stronie Grafany i wysyłane webhookiem do aplikacji Flask. \\
+\noindent
+Miejsce na zrzuty: dashboard, panel alertu, konfiguracja kontaktu webhook.
+
+\subsection{Webhook do aplikacji}
+\noindent
+Integracja webhook realizowana jest przez endpoint aplikacji i statusy alertu.
+\begin{minted}{python}
+@app.route("/webhook/alert", methods=["POST"])
+def handle_grafana_alert():
+		status = request.json.get("status")
+		if status == "firing":
+				handle_alarm_on()
+		elif status == "resolved":
+				handle_alarm_off()
+\end{minted}
